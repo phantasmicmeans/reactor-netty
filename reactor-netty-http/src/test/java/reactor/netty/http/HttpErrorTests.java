@@ -22,20 +22,18 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
-import reactor.netty.DisposableServer;
+import reactor.netty.BaseHttpTest;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.http.server.HttpServer;
 import reactor.test.StepVerifier;
 
 /**
  * @author tokuhirom
  */
-public class HttpErrorTests {
+class HttpErrorTests extends BaseHttpTest {
 
 	@Test
-	public void test() {
-		DisposableServer server = HttpServer.create()
-		                              .port(0)
+	void test() {
+		disposableServer = createServer()
 		                              .route(httpServerRoutes -> httpServerRoutes.get(
 				                                "/",
 				                                (httpServerRequest, httpServerResponse) -> {
@@ -44,8 +42,7 @@ public class HttpErrorTests {
 				                                }))
 		                                    .bindNow(Duration.ofSeconds(30));
 
-		HttpClient client = HttpClient.create()
-		                              .port(server.port());
+		HttpClient client = createClient(disposableServer.port());
 
 		StepVerifier.create(client.get()
 		                             .uri("/")
@@ -54,7 +51,5 @@ public class HttpErrorTests {
 		                             .collectList())
 		            .expectNextMatches(List::isEmpty)
 		            .verifyComplete();
-
-		server.disposeNow();
 	}
 }

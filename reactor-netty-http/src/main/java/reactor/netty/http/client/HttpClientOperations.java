@@ -405,7 +405,7 @@ class HttpClientOperations extends HttpOperations<NettyInbound, NettyOutbound>
 		if (source instanceof Mono) {
 			return super.send(source);
 		}
-		if ((Objects.equals(method(), HttpMethod.GET) || Objects.equals(method(), HttpMethod.HEAD))) {
+		if (Objects.equals(method(), HttpMethod.GET) || Objects.equals(method(), HttpMethod.HEAD)) {
 
 			ByteBufAllocator alloc = channel().alloc();
 			return new PostHeadersNettyOutbound(Flux.from(source)
@@ -514,13 +514,21 @@ class HttpClientOperations extends HttpOperations<NettyInbound, NettyOutbound>
 	@Override
 	protected void beforeMarkSentHeaders() {
 		if (redirectedFrom.length > 0) {
-			if(redirectRequestConsumer != null) {
+			if (redirectRequestConsumer != null) {
 				redirectRequestConsumer.accept(this);
 			}
 			if (redirectRequestBiConsumer != null && previousRequestHeaders != null) {
 				redirectRequestBiConsumer.accept(previousRequestHeaders, this);
 				previousRequestHeaders = null;
 			}
+		}
+	}
+
+	@Override
+	protected void onHeadersSent() {
+		channel().read();
+		if (channel().parent() != null) {
+			channel().parent().read();
 		}
 	}
 
@@ -864,7 +872,7 @@ class HttpClientOperations extends HttpOperations<NettyInbound, NettyOutbound>
 				ChannelFuture f = parent.channel()
 				                        .writeAndFlush(r);
 
-				Flux<Long> tail = encoder.progressFlux.onBackpressureLatest();
+				Flux<Long> tail = encoder.progressSink.asFlux().onBackpressureLatest();
 
 				if (encoder.cleanOnTerminate) {
 					tail = tail.doOnCancel(encoder)
@@ -900,7 +908,7 @@ class HttpClientOperations extends HttpOperations<NettyInbound, NettyOutbound>
 	}
 
 	static final int                    MAX_REDIRECTS      = 50;
-	@SuppressWarnings({"unchecked","rawtypes"})
-	static final Supplier<String>[]     EMPTY_REDIRECTIONS = (Supplier<String>[])new Supplier[0];
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	static final Supplier<String>[]     EMPTY_REDIRECTIONS = (Supplier<String>[]) new Supplier[0];
 	static final Logger                 log                = Loggers.getLogger(HttpClientOperations.class);
 }

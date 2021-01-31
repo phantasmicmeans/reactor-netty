@@ -29,11 +29,11 @@ import reactor.netty.transport.AddressUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class UriEndpointFactoryTest {
+class UriEndpointFactoryTest {
 	private final UriEndpointFactoryBuilder builder = new UriEndpointFactoryBuilder();
 
 	@Test
-	public void shouldParseUrls_1() {
+	void shouldParseUrls_1() {
 		List<String[]> inputs = Arrays.asList(
 				new String[]{"http://localhost:80/path", "http", "localhost", "80", "/path"},
 				new String[]{"http://localhost:80/path?key=val", "http", "localhost", "80", "/path?key=val"},
@@ -69,7 +69,7 @@ public class UriEndpointFactoryTest {
 				new String[]{"localhost/:1234", null, "localhost", null, "/:1234"}
 				);
 
-		for(String[] input : inputs) {
+		for (String[] input : inputs) {
 			Matcher matcher = UriEndpointFactory.URL_PATTERN
 					.matcher(input[0]);
 			assertThat(matcher.matches()).isTrue();
@@ -81,7 +81,7 @@ public class UriEndpointFactoryTest {
 	}
 
 	@Test
-	public void shouldParseUrls_2() throws Exception {
+	void shouldParseUrls_2() throws Exception {
 		List<String[]> inputs = Arrays.asList(
 				new String[]{"http://localhost:80/path", "http://localhost/path"},
 				new String[]{"http://localhost:80/path?key=val", "http://localhost/path?key=val"},
@@ -114,13 +114,13 @@ public class UriEndpointFactoryTest {
 				new String[]{"http://[::1]:1234", "http://[::1]:1234/"}
 		);
 
-		for(String[] input : inputs) {
+		for (String[] input : inputs) {
 			assertThat(externalForm(this.builder.build(), input[0], false, true)).isEqualTo(input[1]);
 		}
 	}
 
 	@Test
-	public void createUriEndpointRelative() {
+	void createUriEndpointRelative() {
 		String test1 = this.builder.build()
 				.createUriEndpoint("/foo", false)
 				.toExternalForm();
@@ -133,7 +133,7 @@ public class UriEndpointFactoryTest {
 	}
 
 	@Test
-	public void createUriEndpointRelativeSslSupport() {
+	void createUriEndpointRelativeSslSupport() {
 		String test1 = this.builder.sslSupport()
 				.build()
 				.createUriEndpoint("/foo", false)
@@ -148,7 +148,7 @@ public class UriEndpointFactoryTest {
 	}
 
 	@Test
-	public void createUriEndpointRelativeNoLeadingSlash() {
+	void createUriEndpointRelativeNoLeadingSlash() {
 		String test1 = this.builder.build()
 				.createUriEndpoint("example.com:8080/bar", false)
 				.toExternalForm();
@@ -161,7 +161,7 @@ public class UriEndpointFactoryTest {
 	}
 
 	@Test
-	public void createUriEndpointRelativeAddress() {
+	void createUriEndpointRelativeAddress() {
 		String test1 = this.builder.host("127.0.0.1")
 				.port(8080)
 				.build()
@@ -178,7 +178,7 @@ public class UriEndpointFactoryTest {
 	}
 
 	@Test
-	public void createUriEndpointIPv6Address() {
+	void createUriEndpointIPv6Address() {
 		String test1 = this.builder.host("::1")
 				.port(8080)
 				.build()
@@ -195,7 +195,7 @@ public class UriEndpointFactoryTest {
 	}
 
 	@Test
-	public void createUriEndpointRelativeAddressSsl() {
+	void createUriEndpointRelativeAddressSsl() {
 		String test1 = this.builder.host("example.com")
 				.port(8080)
 				.sslSupport()
@@ -214,7 +214,7 @@ public class UriEndpointFactoryTest {
 	}
 
 	@Test
-	public void createUriEndpointRelativeWithPort() {
+	void createUriEndpointRelativeWithPort() {
 		String test = this.builder
 				.host("example.com")
 				.port(80)
@@ -226,7 +226,7 @@ public class UriEndpointFactoryTest {
 	}
 
 	@Test
-	public void createUriEndpointAbsoluteHttp() throws Exception {
+	void createUriEndpointAbsoluteHttp() throws Exception {
 		testCreateUriEndpointAbsoluteHttp(false);
 		testCreateUriEndpointAbsoluteHttp(true);
 	}
@@ -245,7 +245,7 @@ public class UriEndpointFactoryTest {
 	}
 
 	@Test
-	public void createUriEndpointWithQuery() throws Exception {
+	void createUriEndpointWithQuery() throws Exception {
 		testCreateUriEndpointWithQuery(false);
 		testCreateUriEndpointWithQuery(true);
 	}
@@ -295,7 +295,7 @@ public class UriEndpointFactoryTest {
 	}
 
 	@Test
-	public void createUriEndpointAbsoluteWs() throws Exception {
+	void createUriEndpointAbsoluteWs() throws Exception {
 		testCreateUriEndpointAbsoluteWs(false);
 		testCreateUriEndpointAbsoluteWs(true);
 	}
